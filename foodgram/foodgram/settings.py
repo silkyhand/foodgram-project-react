@@ -16,6 +16,8 @@ SECRET_KEY = 'vabz0bm(@jzxw!pruv)5z*@om7jjqjwew-5kxy@f2ai9j$uy4u'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+AUTH_USER_MODEL = 'users.CustomUser'
+
 ALLOWED_HOSTS = ['*']
 
 
@@ -23,12 +25,14 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'recipes.apps.RecipesConfig',
+    'recipes.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
