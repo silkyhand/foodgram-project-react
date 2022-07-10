@@ -4,8 +4,8 @@ from users.models import CustomUser
 
 class Ingredient(models.Model):
     """Модель ингредиентов"""
-    title = models.CharField('Название ингредиента', max_length=255)
-    measurement_unit = models.CharField('единица измерения', max_length=50)
+    name = models.CharField('Название ингредиента', max_length=255)
+    measurement_unit = models.CharField('Eдиница измерения', max_length=50)
 
     class Meta:
         verbose_name = 'Ингредиент'
@@ -31,9 +31,9 @@ class IngredientAmount(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField('Тег', max_length=15, unique=True)
-    color = models.CharField('Цвет', max_length=15)
-    slug = models.CharField('slug', max_length=15, unique=True)
+    name = models.CharField('Тег', max_length=50, unique=True)
+    color = models.CharField('Цвет', max_length=50)
+    slug = models.CharField('slug', max_length=50, unique=True)
 
     class Meta:
         verbose_name = 'Тег'
@@ -49,17 +49,17 @@ class Recipe(models.Model):
         CustomUser,
         on_delete=models.CASCADE,
         related_name='recipes',
-        verbose_name='Автор'
+        verbose_name='Автор рецепта'
     )
     name = models.CharField(
         'Называние',
         max_length=255        
-        )
+    )
     image = models.ImageField(
         'Картинка',
         upload_to='recipes/' 
     )
-    description = models.TextField(
+    text = models.TextField(
         'описание рецепта',
     )
     ingredients = models.ManyToManyField(
@@ -71,7 +71,7 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(
         Tag,
         related_name='recipes',
-        verbose_name='Тег'
+        verbose_name='Теги'
     )
     cooking_time = models.PositiveSmallIntegerField(
         'Время приготовления'
@@ -88,20 +88,22 @@ class Recipe(models.Model):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.name[:6]
+        return self.name
 
 
 class Favorite(models.Model):
-    """Модель избранных"""
+    """Модель любимых рецептов"""
     user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name='fan'
+        related_name='fan',
+        verbose_name='Пользователь',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='favorite'
+        related_name='favorite',
+        verbose_name='Рецепт',
     )
 
     class Meta:
@@ -109,16 +111,18 @@ class Favorite(models.Model):
         verbose_name_plural = 'Избранное'
 
 
-class ShoppingList(models.Model):
+class ShoppingCart(models.Model):
     user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name='buyer'
+        related_name='buyer',
+        verbose_name='Покупатель'
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='shoppinglist'
+        related_name='shoppinglist',
+        verbose_name='Рецепт'
     )
 
     class Meta:
