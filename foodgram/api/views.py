@@ -1,9 +1,6 @@
 import csv
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen import canvas
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -11,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from api.filters import AuthorAndTagFilter, IngredientSearchFilter
-from recipes.models import (Cart, Favorite, Ingredient, IngredientAmount,
+from recipes.models import (ShoppingCart, Favorite, Ingredient, IngredientAmount,
                             Recipe, Tag, ShoppingCart)
 from api.pagination import LimitPageNumberPagination
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
@@ -105,11 +102,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
             else:
                 final_list[name]['amount'] += item[2]
          
-        response = HttpResponse(content_type='text/csv') 
+        response = HttpResponse(content_type='text/plain') 
         response['Content-Disposition'] = 'attachment; filename="shopping_cart.txt"' 
         writer = csv.writer(response) 
-        for employee in employees: 
-        writer.writerow([employee.eid,employee.ename,employee.econtact]) 
-    return response 
-Источник: https://pythonpip.ru/django/vyvod-djnago-csv        
+        for i, (name, data) in enumerate(final_list.items(), 1):
+            writer.writerow(f'<{i}> {name} - {data["amount"]},'
+                                         f'{data["measurement_unit"]}') 
+        return response 
+        
 
