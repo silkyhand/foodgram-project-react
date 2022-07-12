@@ -11,7 +11,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'name',
         'pub_date',
         'image',
-        'description',
+        'text',
         'cooking_time',
         'pk'
     )
@@ -21,9 +21,9 @@ class RecipeAdmin(admin.ModelAdmin):
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('title', 'measurement_unit', 'pk')
-    search_fields = ('title',)
-    list_filter = ('title',)
+    list_display = ('name', 'measurement_unit', 'pk')
+    search_fields = ('name',)
+    list_filter = ('name',)
     empty_value_display = '-пусто-'
 
 

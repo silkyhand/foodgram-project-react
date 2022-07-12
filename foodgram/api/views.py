@@ -109,5 +109,3 @@ class RecipeViewSet(viewsets.ModelViewSet):
             writer.writerow(f'<{i}> {name} - {data["amount"]},'
                                          f'{data["measurement_unit"]}') 
         return response 
-        
-
