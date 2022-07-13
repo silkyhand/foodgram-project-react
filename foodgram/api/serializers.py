@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from recipes.models import Ingredient, IngredientAmount, Recipe, Tag, Favorite, ShoppingCart
@@ -28,21 +29,15 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
     class Meta:
         model = IngredientAmount
         fields = ('id', 'name', 'measurement_unit', 'amount')
-        # validators = [
-        #    UniqueTogetherValidator(
-        #        queryset=IngredientAmount.objects.all(),
-        #        fields=['ingredient', 'recipe']
-        #    )
-        # ]     
-        #    
-
+       
 
 class RecipeSerializer(serializers.ModelSerializer):
+    image = Base64ImageField()
     tags = TagSerializer(read_only=True, many=True)
     author = CustomUserSerializer(read_only=True)
     ingredients = IngredientAmountSerializer(
+        source='amounts',
         many=True,
-        read_only=True,
     )
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -65,22 +60,15 @@ class RecipeSerializer(serializers.ModelSerializer):
         in_cart = Favorite.objects.filter(user=user, recipe=obj)
         if in_cart.exists():
             return True
-        return False
-        
-    def create_ingredients(self, ingredients, recipe):
-        for ingredient in ingredients:
-            IngredientAmount.objects.create(
-                recipe=recipe,
-                ingredient_id=ingredient.get('id'),
-                amount=ingredient.get('amount'),
-            )
+        return False           
 
     def create(self, validated_data):
-        ingredients = validated_data.pop('ingredients')
-        recipe = Recipe.objects.create(**validated_data)
-        tags = validated_data.get('tags')
-        recipe.tags.set(tags)
-        for ingredient in ingredients:           
+        image = validated_data.pop('image')
+        ingredients_data = validated_data.pop('ingredients')
+        recipe = Recipe.objects.create(image=image, **validated_data)
+        tags_data = validated_data.get('tags')
+        recipe.tags.set(tags_data)
+        for ingredient in ingredients_data:           
             IngredientAmount.objects.create(
                 recipe=recipe,
                 ingredient_id=ingredient.get('id'),
@@ -112,7 +100,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class PartRecipeSerializer(serializers.ModelSerializer):
-    # image = Base64ImageField()
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe
