@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
@@ -7,13 +6,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import CustomUser
 
-# from api.pagination import LimitPageNumberPagination
+from api.pagination import LimitPageNumberPagination
 from api.serializers import FollowSerializer
 from users.models import Follow
 
 
 class CustomUserViewSet(UserViewSet):
-    # pagination_class = LimitPageNumberPagination
+    pagination_class = LimitPageNumberPagination
 
     @action(methods=['get', 'delete'], detail=True, permission_classes=[IsAuthenticated])
     def subscribe(self, request, id=None):
