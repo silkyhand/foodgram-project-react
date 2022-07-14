@@ -7,6 +7,7 @@ from users.models import Follow
 from users.serializers import CustomUserSerializer
 
 
+
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
@@ -36,8 +37,9 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     author = CustomUserSerializer(read_only=True)
     ingredients = IngredientAmountSerializer(
-        source='amounts',
+        source='ingredientamount_set',
         many=True,
+        read_only=True,
     )
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -48,6 +50,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'is_in_shopping_cart', 'name', 'image', 'text',
                   'cooking_time')
 
+    
     def get_is_favorited(self, obj):
         user = self.context.get('request').user
         favorite = Favorite.objects.filter(user=user, recipe=obj)
@@ -60,14 +63,33 @@ class RecipeSerializer(serializers.ModelSerializer):
         in_cart = Favorite.objects.filter(user=user, recipe=obj)
         if in_cart.exists():
             return True
-        return False           
+        return False     
+
+    def validate(self, data):
+        ingredients = self.initial_data.get('ingredients')
+        if not ingredients:
+            raise serializers.ValidationError({
+                'ingredients': 'В рецепте отсутсвуют ингредиенты'})
+        ingredient_list = []
+        for ingredient_item in ingredients:
+            ingredient = get_object_or_404(Ingredient,
+                                           id=ingredient_item['id'])
+            if ingredient in ingredient_list:
+                raise serializers.ValidationError('Такой ингредиент уже есть')
+            ingredient_list.append(ingredient)
+            if int(ingredient_item['amount']) < 0:
+                raise serializers.ValidationError({
+                    'ingredients': ('Ну указано количество ингредиента')
+                })
+        data['ingredients'] = ingredients
+        return data          
 
     def create(self, validated_data):
         image = validated_data.pop('image')
         ingredients_data = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(image=image, **validated_data)
-        tags_data = validated_data.get('tags')
-        recipe.tags.set(tags_data)
+        tags = self.initial_data.get('tags')
+        recipe.tags.set(tags)
         for ingredient in ingredients_data:           
             IngredientAmount.objects.create(
                 recipe=recipe,
@@ -85,7 +107,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'cooking_time', instance.cooking_time
         )
         instance.tags.clear()
-        tags = validated_data.get('tags')
+        tags = self.initial_data.get('tags')
         instance.tags.set(tags)
         IngredientAmount.objects.filter(recipe=instance).all().delete()
         for ingredient in ingredients:           
