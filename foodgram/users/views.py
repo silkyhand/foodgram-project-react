@@ -8,18 +8,19 @@ from .models import CustomUser
 
 from api.pagination import LimitPageNumberPagination
 from api.serializers import FollowSerializer
+from users.serializers import CustomUserSerializer
 from users.models import Follow
 
 
 class CustomUserViewSet(UserViewSet):
     pagination_class = LimitPageNumberPagination
 
-    @action(methods=['get', 'delete'], detail=True, permission_classes=[IsAuthenticated])
+    @action(methods=['post', 'delete'], detail=True, permission_classes=[IsAuthenticated])
     def subscribe(self, request, id=None):
         user = request.user
         author = get_object_or_404(CustomUser, id=id)
    
-        if request.method == "GET":
+        if request.method == "POST":
             if user == author:
                 return Response({
                     'errors': 'Вы не можете подписываться на самого себя'
