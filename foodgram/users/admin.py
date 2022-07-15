@@ -12,7 +12,6 @@ class CustomUSerAdmin(admin.ModelAdmin):
         'pk',
     )
     list_filter = ('username', 'email')
-    search_fields = ('username',)
     empty_value_display = '-пусто-'
 
 
@@ -22,7 +21,6 @@ class FollowAdmin(admin.ModelAdmin):
         'user',
         'author',
     )
-    search_fields = ('author',)
     list_filter = ('author',)
     empty_value_display = '-пусто-'
 

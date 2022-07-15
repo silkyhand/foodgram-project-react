@@ -6,23 +6,16 @@ from .models import (
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = (
-        'author',
-        'name',
-        'pub_date',
-        'image',
-        'text',
-        'cooking_time',
-        'pk'
-    )
-    search_fields = ('author', 'name')
+    list_display = ('name', 'author', 'total_in_favorites')
     list_filter = ('author', 'name', 'tags')
     empty_value_display = '-пусто-'
 
+    def total_in_favorites(self, obj):
+        return obj.favorite.count()
+
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'measurement_unit', 'pk')
-    search_fields = ('name',)
+    list_display = ('name', 'measurement_unit')    
     list_filter = ('name',)
     empty_value_display = '-пусто-'
 
