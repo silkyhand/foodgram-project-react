@@ -8,18 +8,18 @@ from .models import CustomUser
 
 from api.pagination import ProjectPagination
 from api.serializers import FollowSerializer
-from users.serializers import CustomUserSerializer
 from users.models import Follow
 
 
 class CustomUserViewSet(UserViewSet):
     pagination_class = ProjectPagination
 
-    @action(methods=['post', 'delete'], detail=True, permission_classes=[IsAuthenticated])
+    @action(methods=['post', 'delete'], detail=True,
+            permission_classes=[IsAuthenticated])
     def subscribe(self, request, id=None):
         user = request.user
         author = get_object_or_404(CustomUser, id=id)
-   
+
         if request.method == "POST":
             if user == author:
                 return Response({
@@ -40,7 +40,7 @@ class CustomUserViewSet(UserViewSet):
             if user == author:
                 return Response({
                     'errors': 'Вы не можете отписываться от самого себя'
-                },    status=status.HTTP_400_BAD_REQUEST)
+                }, status=status.HTTP_400_BAD_REQUEST)
             follow = Follow.objects.filter(user=user, author=author)
             if follow.exists():
                 follow.delete()

@@ -1,7 +1,6 @@
-from users.models import CustomUser
 from django_filters.rest_framework import FilterSet, filters
-
 from recipes.models import Recipe
+from users.models import CustomUser
 
 
 class RecipeFilter(FilterSet):

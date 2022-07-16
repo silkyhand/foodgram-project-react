@@ -1,8 +1,7 @@
 from django.contrib import admin
 
-from .models import (
-     Favorite, Ingredient, IngredientAmount, Recipe, ShoppingCart, Tag
-)
+from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
+                     ShoppingCart, Tag)
 
 
 class RecipeAdmin(admin.ModelAdmin):
@@ -15,7 +14,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'measurement_unit')    
+    list_display = ('name', 'measurement_unit')
     list_filter = ('name',)
     empty_value_display = '-пусто-'
 

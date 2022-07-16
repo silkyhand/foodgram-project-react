@@ -1,18 +1,18 @@
 import csv
+
 from django.http import HttpResponse
-from rest_framework import status, viewsets
+from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
+                            ShoppingCart, Tag)
+from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework import filters
 
 from api.filters import RecipeFilter
-from recipes.models import (ShoppingCart, Favorite, Ingredient, IngredientAmount,
-                            Recipe, Tag, ShoppingCart)
 from api.pagination import ProjectPagination
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
-from api.serializers import (PartRecipeSerializer, IngredientSerializer,
+from api.serializers import (IngredientSerializer, PartRecipeSerializer,
                              RecipeSerializer, TagSerializer)
 
 
@@ -60,7 +60,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
         favorite_object.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-        
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
@@ -73,16 +72,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 return Response({
                     'errors': 'Рецепт уже есть в списке покупок'
                 }, status=status.HTTP_400_BAD_REQUEST)
-            ShoppingCart.objects.create(user=user, recipe=recipe) 
-            serializer = PartRecipeSerializer(recipe) 
-            return Response(serializer.data, status=status.HTTP_201_CREATED) 
+            ShoppingCart.objects.create(user=user, recipe=recipe)
+            serializer = PartRecipeSerializer(recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         if not recipe_in_cart.exists():
             return Response({
                 'errors': 'Вы не подписаны на этот рецепт'
             }, status=status.HTTP_400_BAD_REQUEST)
         recipe_in_cart.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)     
-                
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated])
@@ -101,11 +99,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 }
             else:
                 final_list[name]['amount'] += item[2]
-         
-        response = HttpResponse(content_type='text/plain') 
-        response['Content-Disposition'] = 'attachment; filename="shopping_cart.txt"' 
-        writer = csv.writer(response) 
+
+        response = HttpResponse(content_type='text/plain')
+        response['Content-Disposition'] = ('attachment; '
+                                           'filename="shopping_cart.txt"')
+        writer = csv.writer(response)
         for i, (name, data) in enumerate(final_list.items(), 1):
             writer.writerow([f'{i}) {name} - {data["amount"]},'
-                                        f'{data["measurement_unit"]}']) 
-        return response 
+                             f'{data["measurement_unit"]}'])
+        return response
