@@ -1,16 +1,16 @@
 import csv
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework import filters
 
-from api.filters import AuthorAndTagFilter, IngredientSearchFilter
+from api.filters import RecipeFilter
 from recipes.models import (ShoppingCart, Favorite, Ingredient, IngredientAmount,
                             Recipe, Tag, ShoppingCart)
-from api.pagination import LimitPageNumberPagination
+from api.pagination import ProjectPagination
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from api.serializers import (PartRecipeSerializer, IngredientSerializer,
                              RecipeSerializer, TagSerializer)
@@ -26,15 +26,15 @@ class IngredientsViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (IngredientSearchFilter,)
+    filter_backends = (filters.SearchFilter,)
     search_fields = ('^name',)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    pagination_class = LimitPageNumberPagination
-    filter_class = AuthorAndTagFilter
+    pagination_class = ProjectPagination
+    filter_class = RecipeFilter
     permission_classes = [IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
@@ -106,6 +106,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = 'attachment; filename="shopping_cart.txt"' 
         writer = csv.writer(response) 
         for i, (name, data) in enumerate(final_list.items(), 1):
-            writer.writerow(f'<{i}> {name} - {data["amount"]},'
-                                         f'{data["measurement_unit"]}') 
+            writer.writerow([f'{i}) {name} - {data["amount"]},'
+                                        f'{data["measurement_unit"]}']) 
         return response 

@@ -6,14 +6,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import CustomUser
 
-from api.pagination import LimitPageNumberPagination
+from api.pagination import ProjectPagination
 from api.serializers import FollowSerializer
 from users.serializers import CustomUserSerializer
 from users.models import Follow
 
 
 class CustomUserViewSet(UserViewSet):
-    pagination_class = LimitPageNumberPagination
+    pagination_class = ProjectPagination
 
     @action(methods=['post', 'delete'], detail=True, permission_classes=[IsAuthenticated])
     def subscribe(self, request, id=None):

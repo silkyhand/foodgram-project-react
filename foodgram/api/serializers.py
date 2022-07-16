@@ -1,8 +1,7 @@
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
-from recipes.models import Ingredient, IngredientAmount, Recipe, Tag, Favorite, ShoppingCart
+from recipes.models import Ingredient, IngredientAmount, Recipe, Tag, Favorite
 from users.models import Follow
 from users.serializers import CustomUserSerializer
 
@@ -153,11 +152,7 @@ class FollowSerializer(serializers.ModelSerializer):
         ).exists()
 
     def get_recipes(self, obj):
-        # request = self.context.get('request')
-        # limit = request.GET.get('recipes_limit')
         queryset = Recipe.objects.filter(author=obj.author)
-        #if limit:
-           #  queryset = queryset[:int(limit)]
         return PartRecipeSerializer(queryset, many=True).data
 
     def get_recipes_count(self, obj):
