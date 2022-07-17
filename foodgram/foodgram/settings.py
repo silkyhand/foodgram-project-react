@@ -20,6 +20,7 @@ DEBUG = True
 AUTH_USER_MODEL = 'users.CustomUser'
 
 ALLOWED_HOSTS = ['*']
+PAGE_SIZE = 6
 
 
 # Application definition
@@ -121,14 +122,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-    ),
+    ],
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
+    
 }
 
 DJOSER = {

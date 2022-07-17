@@ -1,9 +1,13 @@
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import Favorite, Ingredient, IngredientAmount, Recipe, Tag
 from rest_framework import serializers
+
+from recipes.models import (Favorite, Ingredient, IngredientAmount,
+                            Recipe, ShoppingCart, Tag)
 from users.models import Follow
 from users.serializers import CustomUserSerializer
+
+from rest_framework.validators import UniqueTogetherValidator
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -47,23 +51,29 @@ class RecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
                   'is_in_shopping_cart', 'name', 'image', 'text',
                   'cooking_time')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Recipe.objects.all(),
+                fields=['name', 'text']
+            )
+        ]
 
     def get_is_favorited(self, obj):
         user = self.context.get('request').user
         favorite = Favorite.objects.filter(user=user, recipe=obj)
-        if favorite.exists():
-            return True
-        return False
+        return favorite.exists()
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context.get('request').user
-        in_cart = Favorite.objects.filter(user=user, recipe=obj)
-        if in_cart.exists():
-            return True
-        return False
+        in_cart = ShoppingCart.objects.filter(user=user, recipe=obj)
+        return in_cart.exists()
 
     def validate(self, data):
         ingredients = self.initial_data.get('ingredients')
+        cooking_time = self.initial_data.get('cooking_time')
+        if cooking_time == 0:
+            raise serializers.ValidationError({
+                'cooking_time': 'Задайте время приготовления'})
         if not ingredients:
             raise serializers.ValidationError({
                 'ingredients': 'В рецепте отсутсвуют ингредиенты'})
@@ -76,8 +86,10 @@ class RecipeSerializer(serializers.ModelSerializer):
             ingredient_list.append(ingredient)
             if int(ingredient_item['amount']) < 0:
                 raise serializers.ValidationError({
-                    'ingredients': ('Ну указано количество ингредиента')
+                    'ingredients': ('Количество ингредиента'
+                                    'не может быть меньше нуля')
                 })
+
         data['ingredients'] = ingredients
         return data
 
