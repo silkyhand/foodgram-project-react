@@ -1,6 +1,6 @@
 import os
+
 from dotenv import load_dotenv
-from datetime import timedelta
 
 load_dotenv()
 
@@ -20,6 +20,7 @@ DEBUG = True
 AUTH_USER_MODEL = 'users.CustomUser'
 
 ALLOWED_HOSTS = ['*']
+PAGE_SIZE = 6
 
 
 # Application definition
@@ -76,7 +77,8 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
+        'ENGINE': os.getenv('DB_ENGINE',
+                            default='django.db.backends.postgresql'),
         'NAME': os.getenv('DB_NAME', default='foodgram'),
         'USER': os.getenv('POSTGRES_USER', default='postgres'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='lomonosova372'),
@@ -89,21 +91,14 @@ DATABASES = {
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.%s' % validator}
+    for validator in [
+        'UserAttributeSimilarityValidator',
+        'MinimumLengthValidator',
+        'CommonPasswordValidator',
+        'NumericPasswordValidator',
+    ]
 ]
-
-
 
 LANGUAGE_CODE = 'en-us'
 
@@ -127,19 +122,19 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-    ),
+    ],
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
+    
 }
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
-    # 'HIDE_USERS': False,
     'SERIALIZERS': {
         'user_create': 'users.serializers.CustomUserCreateSerializer',
         'user': 'users.serializers.CustomUserSerializer',

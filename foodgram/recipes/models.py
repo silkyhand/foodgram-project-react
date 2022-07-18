@@ -53,11 +53,11 @@ class Recipe(models.Model):
     )
     name = models.CharField(
         'Называние',
-        max_length=255        
+        max_length=255
     )
     image = models.ImageField(
         'Картинка',
-        upload_to='recipes/' 
+        upload_to='recipes/'
     )
     text = models.TextField(
         'описание рецепта',
@@ -81,7 +81,6 @@ class Recipe(models.Model):
         verbose_name='Дата публикации',
         auto_now_add=True
     )
-    
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'

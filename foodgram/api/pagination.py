@@ -1,6 +1,6 @@
+from django.conf import settings as s
 from rest_framework.pagination import PageNumberPagination
 
 
-class LimitPageNumberPagination(PageNumberPagination):
-    page_size = 6
-    page_size_query_param = 'limit'
+class ProjectPagination(PageNumberPagination):
+    page_size = s.PAGE_SIZE
