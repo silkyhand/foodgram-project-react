@@ -33,6 +33,7 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
         model = IngredientAmount
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
+
 class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
     tags = TagSerializer(read_only=True, many=True)
