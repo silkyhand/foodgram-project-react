@@ -93,22 +93,26 @@ class RecipeSerializer(serializers.ModelSerializer):
         data['ingredients'] = ingredients
         return data
 
-    def create(self, validated_data):
-        image = validated_data.pop('image')
-        ingredients_data = validated_data.pop('ingredients')
-        recipe = Recipe.objects.create(image=image, **validated_data)
-        tags = self.initial_data.get('tags')
-        recipe.tags.set(tags)
-        for ingredient in ingredients_data:
-            IngredientAmount.objects.create(
+    def add_ingredients(self, ingredients, recipe):        
+        ingr = [
+            IngredientAmount(
                 recipe=recipe,
                 ingredient_id=ingredient.get('id'),
                 amount=ingredient.get('amount'),
-            )
+            ) for ingredient in ingredients
+        ]
+        IngredientAmount.objects.bulk_create(ingr)
+
+    def create(self, validated_data):
+        image = validated_data.pop('image')
+        ingredients_data = validated_data.pop('ingredients')        
+        recipe = Recipe.objects.create(image=image, **validated_data)
+        tags = self.initial_data.get('tags')
+        recipe.tags.set(tags)
+        self.add_ingredients(ingredients_data, recipe)
         return recipe
 
-    def update(self, instance, validated_data):
-        ingredients = validated_data.pop('ingredients')
+    def update(self, instance, validated_data):        
         instance.image = validated_data.get('image', instance.image)
         instance.name = validated_data.get('name', instance.name)
         instance.text = validated_data.get('text', instance.text)
@@ -119,12 +123,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags = self.initial_data.get('tags')
         instance.tags.set(tags)
         IngredientAmount.objects.filter(recipe=instance).all().delete()
-        for ingredient in ingredients:
-            IngredientAmount.objects.create(
-                recipe=instance,
-                ingredient_id=ingredient.get('id'),
-                amount=ingredient.get('amount'),
-            )
+        self.add_ingredients(validated_data.get('ingredients'), instance)
         instance.save()
         return instance
 
@@ -146,7 +145,7 @@ class FollowSerializer(serializers.ModelSerializer):
     last_name = serializers.ReadOnlyField(source='author.last_name')
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
-    recipes_count = serializers.SerializerMethodField()
+    recipes_count = serializers.IntegerField(source='following_recipes.count', read_only=True)
 
     class Meta:
         model = Follow
@@ -161,6 +160,3 @@ class FollowSerializer(serializers.ModelSerializer):
     def get_recipes(self, obj):
         queryset = Recipe.objects.filter(author=obj.author)
         return PartRecipeSerializer(queryset, many=True).data
-
-    def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj.author).count()
