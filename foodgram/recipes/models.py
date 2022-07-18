@@ -1,4 +1,6 @@
+from django.core import validators
 from django.db import models
+
 from users.models import CustomUser
 
 
@@ -24,10 +26,15 @@ class IngredientAmount(models.Model):
                                on_delete=models.CASCADE,
                                related_name='ingredient_amounts',
                                verbose_name='Рецепт')
-    amount = models.PositiveSmallIntegerField('Количество')
+    amount = models.PositiveSmallIntegerField(
+        validators=(
+            validators.MinValueValidator(
+                1, message='Количество ингредиентов должно быть больше "1"'),),
+        verbose_name='Количество',
+    )
 
     def __str__(self):
-        return self.ingredient.title
+        return self.ingredient.name
 
 
 class Tag(models.Model):
@@ -81,6 +88,7 @@ class Recipe(models.Model):
         verbose_name='Дата публикации',
         auto_now_add=True
     )
+
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'

@@ -5,7 +5,8 @@ from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'author', 'total_in_favorites')
+    list_display = ('name', 'author', 'ingredients',
+                    'total_in_favorites', 'pk')
     list_filter = ('author', 'name', 'tags')
     empty_value_display = '-пусто-'
 
