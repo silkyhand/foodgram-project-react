@@ -4,11 +4,18 @@ from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
                      ShoppingCart, Tag)
 
 
+class IngredientInline(admin.TabularInline):
+    model = IngredientAmount
+
+
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'author', 'ingredients',
+    list_display = ('name', 'author',
                     'total_in_favorites', 'pk')
     list_filter = ('author', 'name', 'tags')
     empty_value_display = '-пусто-'
+    inlines = (
+        IngredientInline,
+        )
 
     def total_in_favorites(self, obj):
         return obj.favorite.count()
