@@ -8,6 +8,7 @@ from users.models import Follow
 from users.serializers import CustomUserSerializer
 
 from rest_framework.validators import UniqueTogetherValidator
+from rest_framework.exceptions import ValidationError
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -151,6 +152,13 @@ class FollowSerializer(serializers.ModelSerializer):
         model = Follow
         fields = ('id', 'email', 'username', 'first_name', 'last_name',
                   'is_subscribed', 'recipes', 'recipes_count')
+
+    
+    def validate_id(self, value):
+        user = self.context['request'].user
+        if user.id == value:
+            raise ValidationError('Нельзя подписаться на самого себя')
+        return value
 
     def get_is_subscribed(self, obj):
         return Follow.objects.filter(

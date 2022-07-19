@@ -1,4 +1,4 @@
-from django.core import validators
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from users.models import CustomUser
@@ -28,10 +28,9 @@ class IngredientAmount(models.Model):
                                verbose_name='Рецепт')
     amount = models.PositiveSmallIntegerField(
         validators=(
-            validators.MinValueValidator(
-                1, message='Количество ингредиентов должно быть больше "1"'),),
-        verbose_name='Количество',
-    )
+            MinValueValidator(
+                1, message='Минимальное количество ингредиента 1'),),
+        verbose_name='Количество')
 
     def __str__(self):
         return self.ingredient.name
@@ -81,8 +80,10 @@ class Recipe(models.Model):
         verbose_name='Теги'
     )
     cooking_time = models.PositiveSmallIntegerField(
-        'Время приготовления'
-    )
+        validators=(
+            MinValueValidator(
+                1, message='Минимальное время приготовления 1'),),
+        verbose_name='Время приготовления')        
 
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
@@ -116,6 +117,10 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'recipe'],
+                                    name='unique favorite_recipe_user')
+        ]
 
 
 class ShoppingCart(models.Model):
@@ -135,3 +140,7 @@ class ShoppingCart(models.Model):
     class Meta:
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Список покупок'
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'recipe'],
+                                    name='unique_user_shoppingcart')
+        ]

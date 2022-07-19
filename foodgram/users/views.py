@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import CustomUser
+from users.models import CustomUser
 
 from api.pagination import ProjectPagination
 from api.serializers import FollowSerializer
@@ -21,10 +21,7 @@ class CustomUserViewSet(UserViewSet):
         author = get_object_or_404(CustomUser, id=id)
 
         if request.method == "POST":
-            if user == author:
-                return Response({
-                    'errors': 'Вы не можете подписываться на самого себя'
-                }, status=status.HTTP_400_BAD_REQUEST)
+           
             if Follow.objects.filter(user=user, author=author).exists():
                 return Response({
                     'errors': 'Вы уже подписаны на данного пользователя'
