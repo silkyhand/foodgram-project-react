@@ -21,12 +21,15 @@ class CustomUserViewSet(UserViewSet):
         author = get_object_or_404(CustomUser, id=id)
 
         if request.method == "POST":
-           
+            if user == author:
+                return Response({
+                    'errors': 'Вы не можете подписываться на самого себя'
+                }, status=status.HTTP_400_BAD_REQUEST)
             if Follow.objects.filter(user=user, author=author).exists():
                 return Response({
                     'errors': 'Вы уже подписаны на данного пользователя'
                 }, status=status.HTTP_400_BAD_REQUEST)
-
+                       
             follow = Follow.objects.create(user=user, author=author)
             serializer = FollowSerializer(
                 follow, context={'request': request}
