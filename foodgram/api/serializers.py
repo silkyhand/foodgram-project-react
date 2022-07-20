@@ -70,12 +70,14 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate(self, data):
         ingredients = self.initial_data.get('ingredients')
         cooking_time = self.initial_data.get('cooking_time')
-        if cooking_time == 0:
-            raise serializers.ValidationError({
-                'cooking_time': 'Задайте время приготовления'})
+        if not cooking_time > 0:
+            raise serializers.ValidationError(
+                'Задайте время приготовления'
+            )
         if not ingredients:
-            raise serializers.ValidationError({
-                'ingredients': 'В рецепте отсутсвуют ингредиенты'})
+            raise serializers.ValidationError(
+                'В рецепте отсутсвуют ингредиенты'
+            )
         ingredient_list = []
         for ingredient_item in ingredients:
             ingredient = get_object_or_404(Ingredient,
@@ -84,10 +86,8 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError('Такой ингредиент уже есть')
             ingredient_list.append(ingredient)
             if int(ingredient_item['amount']) < 0:
-                raise serializers.ValidationError({
-                    'ingredients': ('Количество ингредиента'
-                                    'не может быть меньше нуля')
-                })
+                raise serializers.ValidationError(
+                    'Количество ингредиента не может быть меньше нуля')
 
         data['ingredients'] = ingredients
         return data

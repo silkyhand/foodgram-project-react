@@ -1,11 +1,13 @@
 from django.contrib import admin
+from django.contrib.admin import TabularInline
 
 from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
                      ShoppingCart, Tag)
 
 
-class IngredientInline(admin.TabularInline):
+class IngredientInline(TabularInline):
     model = IngredientAmount
+    min_num = 1
 
 
 class RecipeAdmin(admin.ModelAdmin):

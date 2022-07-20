@@ -1,9 +1,3 @@
-from api.filters import RecipeFilter
-from api.pagination import ProjectPagination
-from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
-from api.serializers import (IngredientSerializer, PartRecipeSerializer,
-                             RecipeSerializer, TagSerializer)
-from . import services
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
@@ -11,7 +5,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
+from api.filters import RecipeFilter
+from api.pagination import ProjectPagination
+from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
+from api.serializers import (IngredientSerializer, PartRecipeSerializer,
+                             RecipeSerializer, TagSerializer)
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+
+from . import services
 
 
 class TagsViewSet(ReadOnlyModelViewSet):
@@ -52,7 +53,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk=None):
         if request.method == 'POST':
             return self.add_func(ShoppingCart, request.user, pk)
-        elif request.method == 'DELETE':
+        if request.method == 'DELETE':
             return self.delete_func(ShoppingCart, request.user, pk)
         return None
 
