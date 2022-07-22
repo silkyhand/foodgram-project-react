@@ -35,6 +35,14 @@ class IngredientAmount(models.Model):
     def __str__(self):
         return self.ingredient.name
 
+    class Meta:
+        verbose_name = 'Количество ингредиента'
+        verbose_name_plural = 'Количество ингредиентов'
+        constraints = [
+            models.UniqueConstraint(fields=['ingredient', 'recipe'],
+                                    name='unique ingredients recipe')
+        ]
+
 
 class Tag(models.Model):
     name = models.CharField('Тег', max_length=50, unique=True)
