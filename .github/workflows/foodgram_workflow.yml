@@ -20,7 +20,7 @@ jobs:
         pip install -r foodgram/requirements.txt
     - name: Test with flake8
       run: |
-        python -m flake8 backend
+        python -m flake8 foodgram
 
 
   build_and_push_to_docker_hub:
@@ -41,8 +41,8 @@ jobs:
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
         with:
-          context: ./backend
-          file: ./backend/Dockerfile
+          context: ./foodgram
+          file: ./foodgram/Dockerfile
           push: true
           tags: silkyhand/foodgram:latest
 
