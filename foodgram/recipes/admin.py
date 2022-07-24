@@ -17,7 +17,7 @@ class RecipeAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
     inlines = (
         IngredientInline,
-        )
+    )
 
     def total_in_favorites(self, obj):
         return obj.favorite.count()

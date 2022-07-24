@@ -20,11 +20,9 @@ class Ingredient(models.Model):
 class IngredientAmount(models.Model):
     """Модель соединения ингредиента и его количества с рецептом"""
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE,
-                                   related_name='amounts',
                                    verbose_name='Ингредиент')
     recipe = models.ForeignKey('Recipe',
                                on_delete=models.CASCADE,
-                               related_name='ingredient_amounts',
                                verbose_name='Рецепт')
     amount = models.PositiveSmallIntegerField(
         validators=(

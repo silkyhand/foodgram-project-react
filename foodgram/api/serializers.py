@@ -74,7 +74,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate(self, data):
         ingredients = self.initial_data.get('ingredients')
         cooking_time = self.initial_data.get('cooking_time')
-        if not cooking_time > 0:
+        if not int(cooking_time) > 0:
             raise serializers.ValidationError(
                 'Задайте время приготовления'
             )
@@ -109,13 +109,14 @@ class RecipeSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         image = validated_data.pop('image')
         ingredients_data = validated_data.pop('ingredients')
+        tags_data = self.initial_data.pop('tags')
         recipe = Recipe.objects.create(image=image, **validated_data)
-        tags = self.initial_data.get('tags')
-        recipe.tags.set(tags)
         self.add_ingredients(ingredients_data, recipe)
+        recipe.tags.set(tags_data)
         return recipe
 
     def update(self, instance, validated_data):
+        tags_data = self.initial_data.pop('tags')
         instance.image = validated_data.get('image', instance.image)
         instance.name = validated_data.get('name', instance.name)
         instance.text = validated_data.get('text', instance.text)
@@ -123,8 +124,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'cooking_time', instance.cooking_time
         )
         instance.tags.clear()
-        tags = self.initial_data.get('tags')
-        instance.tags.set(tags)
+        instance.tags.set(tags_data)
         IngredientAmount.objects.filter(recipe=instance).all().delete()
         self.add_ingredients(validated_data.get('ingredients'), instance)
         instance.save()
