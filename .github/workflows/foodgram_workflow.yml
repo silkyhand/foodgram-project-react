@@ -60,7 +60,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo docker pull silkyhand/foodgram
-            sudo docker pull silkyhand/frontend
+            sudo docker pull silkyhand/frontend:v1
             sudo docker compose stop
             sudo docker compose rm backend
             rm .env
