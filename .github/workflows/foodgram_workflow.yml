@@ -59,7 +59,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            sudo docker pull silkyhand/foodgram
+            sudo docker pull silkyhand/foodgram:latest
             sudo docker pull silkyhand/frontend:v1
             sudo docker compose stop
             sudo docker compose rm backend
