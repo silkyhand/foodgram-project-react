@@ -10,7 +10,7 @@ services:
       - ./.env
 
   backend:
-    image: silkyhand/foodgram:v21.07
+    image: silkyhand/foodgram
     restart: always
     volumes:
       - static_value:/code/static/
