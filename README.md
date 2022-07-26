@@ -77,3 +77,7 @@ git clone https://github.com/silkyhand/foodgram-project-react
 
 # В настоящий момент проект доступен по адресу
 http://51.250.51.196/
+Доступ в admin:
+user: admin
+email: admin@mail.ru
+password: $12345678
