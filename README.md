@@ -1,3 +1,4 @@
+![yamdb_workflow](https://github.com/silkyhand/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
 # Проект Foodgram
 
 Foodgram - сайт для публикации рецептов. Авторизованные пользователи
