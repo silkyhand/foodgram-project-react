@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from api.filters import RecipeFilter, IngredientSearchFilter
+from api.filters import IngredientSearchFilter, RecipeFilter
 from api.pagination import ProjectPagination
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from api.serializers import (IngredientSerializer, PartRecipeSerializer,
